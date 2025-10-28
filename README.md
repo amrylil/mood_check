@@ -2,14 +2,6 @@
 
 API sederhana untuk mencatat mood harian pengguna. Dibangun menggunakan Bun, Hono, dan PostgreSQL dengan fokus pada keamanan dan performa.
 
-## 📋 Daftar Isi
-
-- [Teknologi](#teknologi)
-- [Instalasi & Menjalankan](#instalasi--menjalankan)
-- [Konfigurasi](#konfigurasi)
-- [Alur & Endpoint API](#alur--endpoint-api)
-- [Alasan Desain & Keamanan](#alasan-desain--keamanan)
-
 ## 🛠️ Teknologi
 
 - **Runtime:** Bun
@@ -189,25 +181,3 @@ Menampilkan ringkasan mood 30 hari terakhir milik Anda.
   "total_reports": 25
 }
 ```
-
-## 🔐 Alasan Desain & Keamanan
-
-### Keamanan (IDOR)
-
-Endpoint GET tidak menggunakan `/mood/{userId}`. Sebaliknya, `GET /mood` mengambil `userId` dari token. Ini mencegah pengguna A mencoba menebak ID pengguna B di URL.
-
-### Stateless
-
-JWT membuat API ini stateless, mempermudah scaling.
-
-### Validasi
-
-Zod memvalidasi semua payload request untuk mencegah data buruk masuk ke sistem.
-
-### Arsitektur
-
-Proyek ini menggunakan arsitektur 3-lapis (Handler, Service, Repository) untuk memisahkan tanggung jawab. Error ditangani di Service (`HTTPException`) dan ditangkap oleh global error handler `app.onError`.
-
----
-
-**Dibuat dengan ❤️ menggunakan Bun, Hono, dan PostgreSQL**
