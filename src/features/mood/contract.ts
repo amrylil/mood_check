@@ -6,7 +6,7 @@ import {
 } from "./dtos/mood.dto";
 
 export interface IMoodRepository {
-  create(dto: CreateMoodRequestDto): Promise<MoodReport>;
+  create(dto: CreateMoodRequestDto, userId: string): Promise<MoodReport>;
 
   findByUserId(userId: string): Promise<MoodReport[]>;
 
@@ -21,7 +21,7 @@ export interface IMoodRepository {
 }
 
 export interface IMoodService {
-  create(dto: CreateMoodRequestDto): Promise<MoodResponseDto>;
+  create(dto: CreateMoodRequestDto, userId: string): Promise<MoodResponseDto>;
 
   getByUserId(userId: string): Promise<MoodResponseDto[]>;
 

@@ -29,8 +29,11 @@ export class MoodService implements IMoodService {
     };
   }
 
-  async create(dto: CreateMoodRequestDto): Promise<MoodResponseDto> {
-    const createdReport = await this.repo.create(dto);
+  async create(
+    dto: CreateMoodRequestDto,
+    userId: string
+  ): Promise<MoodResponseDto> {
+    const createdReport = await this.repo.create(dto, userId);
     return this.mapToResponse(createdReport);
   }
 

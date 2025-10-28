@@ -9,11 +9,14 @@ registry.register("CreateMoodRequest", createMoodRequestSchema);
 registry.register("MoodResponse", moodResponseSchema);
 registry.register("MoodSummaryResponse", moodSummaryResponseSchema);
 
+const securityScheme = [{ bearerAuth: [] }];
+
 registry.registerPath({
   method: "post",
   path: "/mood",
   tags: ["Mood"],
-  summary: "Create new mood report",
+  summary: "Create new mood report (Protected)",
+  security: securityScheme,
   request: {
     body: {
       content: {
@@ -33,26 +36,21 @@ registry.registerPath({
       },
     },
     400: { description: "Validation error" },
+    401: { description: "Unauthorized" },
+    403: { description: "Forbidden" },
     409: { description: "Mood report for this date already exists" },
   },
 });
 
 registry.registerPath({
   method: "get",
-  path: "/mood/{userId}",
+  path: "/mood",
   tags: ["Mood"],
-  summary: "Get mood history for a user",
-  parameters: [
-    {
-      name: "userId",
-      in: "path",
-      required: true,
-      schema: { type: "string", format: "uuid" },
-    },
-  ],
+  summary: "Get my mood history (Protected)",
+  security: securityScheme,
   responses: {
     200: {
-      description: "List of all mood reports for the user",
+      description: "List of my mood reports",
       content: {
         "application/json": {
           schema: {
@@ -62,30 +60,27 @@ registry.registerPath({
         },
       },
     },
+    401: { description: "Unauthorized" },
+    403: { description: "Forbidden" },
   },
 });
 
 registry.registerPath({
   method: "get",
-  path: "/mood/summary/{userId}",
+  path: "/mood/summary",
   tags: ["Mood"],
-  summary: "Get mood summary for a user",
-  parameters: [
-    {
-      name: "userId",
-      in: "path",
-      required: true,
-      schema: { type: "string", format: "uuid" },
-    },
-  ],
+  summary: "Get my mood summary (Protected)",
+  security: securityScheme,
   responses: {
     200: {
-      description: "Mood summary retrieved successfully",
+      description: "My mood summary retrieved successfully",
       content: {
         "application/json": {
           schema: { $ref: "#/components/schemas/MoodSummaryResponse" },
         },
       },
     },
+    401: { description: "Unauthorized" },
+    403: { description: "Forbidden" },
   },
 });

@@ -9,13 +9,13 @@ export class MoodRepository implements IMoodRepository {
     this.prisma = new PrismaClient();
   }
 
-  async create(dto: CreateMoodRequestDto): Promise<MoodReport> {
+  async create(dto: CreateMoodRequestDto, userId: string): Promise<MoodReport> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     return this.prisma.moodReport.create({
       data: {
-        userId: dto.userId,
+        userId: userId,
         date: today,
         mood_score: dto.mood_score,
         mood_label: dto.mood_label,

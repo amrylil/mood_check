@@ -1,76 +1,213 @@
-# CV Evaluation AI API
+# Mood Check-in API
 
-A simple API based on Express.js and TypeScript for evaluating CVs using RAG (Retrieval-Augmented Generation) approach with DeepSeek model from OpenRouter.
+API sederhana untuk mencatat mood harian pengguna. Dibangun menggunakan Bun, Hono, dan PostgreSQL dengan fokus pada keamanan dan performa.
 
-**Tech Stack**: Express.js, TypeScript, Prisma, PostgreSQL, OpenRouter, Vector Embeddings.
+## 📋 Daftar Isi
 
-## How to Run
+- [Teknologi](#teknologi)
+- [Instalasi & Menjalankan](#instalasi--menjalankan)
+- [Konfigurasi](#konfigurasi)
+- [Alur & Endpoint API](#alur--endpoint-api)
+- [Alasan Desain & Keamanan](#alasan-desain--keamanan)
 
-### 1. Clone & Enter Directory
+## 🛠️ Teknologi
+
+- **Runtime:** Bun
+- **Framework:** Hono
+- **Database:** PostgreSQL
+- **ORM:** Prisma
+- **Validasi:** Zod
+- **Autentikasi:** JWT (via hono/jwt)
+- **Lainnya:** bcrypt, TypeScript
+
+## 🚀 Instalasi & Menjalankan
+
+### Prasyarat
+
+- Bun
+- PostgreSQL
+
+### Clone & Instal
 
 ```bash
-git clone https://github.com/amrylil/cv_evaluation_api.git
-cd cv-evaluation-api
+git clone https://github.com/amrylil/mood_check.git
+cd mood_check
+bun install
 ```
 
-### 2. Install Dependencies
+### Setup Database & Environment
 
-```bash
-npm install
-```
-
-### 3. Setup Environment Variables
-
-Copy the example file `.env.example` to `.env`, then fill in the values.
+1. Salin `.env.example` menjadi `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-See details below.
+2. Isi `DATABASE_URL` di file `.env` dengan koneksi PostgreSQL Anda
 
-### 4. Setup Database (Migrate & Seed)
-
-This command will set up the database schema and populate it with initial data.
+3. Jalankan migrasi database:
 
 ```bash
-npm run db:setup
+bunx prisma migrate dev
 ```
 
-### 5. Run Server
+### Jalankan Server
 
 ```bash
-npm run dev
+bun run src/index.ts
 ```
 
-The server will start and you can access the API documentation at:
-http://localhost:3000/api/v1/docs
+Server akan berjalan di:
 
-## Environment Variables (`.env`)
+- **Server:** http://localhost:3000
+- **Docs:** http://localhost:3000/api/v1/docs/ui
 
-Fill your `.env` file as follows:
+## ⚙️ Konfigurasi
 
-```
-# Database connection URL for Prisma
+Buat file `.env` berdasarkan `.env.example`:
+
+```env
+# Port server
+PORT=3000
+
+# URL koneksi database PostgreSQL Anda (sesuai format Prisma)
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 
-# API Key from OpenRouter.ai
-OPENROUTER_API_KEY="sk-or-v1-..."
-
-# Model Name (Optional, default already exists)
-DEEPSEEK_MODEL_NAME="deepseek/deepseek-chat"
-
-# Server Port
-PORT=3000
+# Kunci rahasia untuk menandatangani JWT
+JWT_SECRET="ganti-dengan-kunci-rahasia-anda-yang-kuat"
 ```
 
-## Explanation Why `.env` Is Included (Pushed)
+## 📡 Alur & Endpoint API
 
-For ease of demonstration and testing of this project, the `.env` file is intentionally included in the repository. The purpose is so that anyone who clones this project can immediately see what variables are needed without having to search around.
+Semua endpoint berada di bawah prefix `/api/v1`.
 
-**Warning**: In real-world production projects, the `.env` file **must** be added to `.gitignore` to protect sensitive credentials such as API keys and database connection details.
+### Alur Autentikasi (Wajib)
 
-## Main Commands
+Semua endpoint mood terproteksi. Pengguna harus login terlebih dahulu.
 
-- `npm run dev`: Run development server.
-- `npm run db:setup`: Run database migration and seeding in one command.
+1. **Login:** Panggil `POST /auth/login` untuk mendapatkan Access Token (JWT)
+2. **Panggil Endpoint:** Untuk semua request ke `/mood`, sertakan header Authorization:
+
+```
+Authorization: Bearer <token_anda>
+```
+
+**Keamanan:** Server mengambil `userId` langsung dari token. Anda tidak perlu mengirim `userId` di URL.
+
+### 🔓 Endpoint Autentikasi (Publik)
+
+#### `POST /auth/register`
+
+Mendaftarkan pengguna baru.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "John Doe"
+}
+```
+
+#### `POST /auth/login`
+
+Login untuk mendapatkan token.
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "user-id",
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+```
+
+### 🔒 Endpoint Mood (Terproteksi)
+
+Endpoint ini wajib menyertakan header `Authorization: Bearer <token>`.
+
+#### `POST /mood`
+
+Menyimpan mood baru untuk pengguna yang sedang login.
+
+**Request Body:**
+
+```json
+{
+  "userId": "user-id",
+  "mood_score": 8,
+  "mood_label": "Happy",
+  "notes": "Hari yang menyenangkan!"
+}
+```
+
+**Catatan Keamanan:** `userId` di body harus sama dengan `userId` di dalam token.
+
+#### `GET /mood`
+
+Menampilkan riwayat mood milik Anda (pengguna yang sedang login).
+
+**Response:**
+
+```json
+[
+  {
+    "id": "mood-id",
+    "mood_score": 8,
+    "mood_label": "Happy",
+    "notes": "Hari yang menyenangkan!",
+    "created_at": "2025-10-28T10:00:00Z"
+  }
+]
+```
+
+#### `GET /mood/summary`
+
+Menampilkan ringkasan mood 30 hari terakhir milik Anda.
+
+**Response:**
+
+```json
+{
+  "userId": "user-id",
+  "period": "30 days",
+  "average_score": 7.5,
+  "total_reports": 25
+}
+```
+
+## 🔐 Alasan Desain & Keamanan
+
+### Keamanan (IDOR)
+
+Endpoint GET tidak menggunakan `/mood/{userId}`. Sebaliknya, `GET /mood` mengambil `userId` dari token. Ini mencegah pengguna A mencoba menebak ID pengguna B di URL.
+
+### Stateless
+
+JWT membuat API ini stateless, mempermudah scaling.
+
+### Validasi
+
+Zod memvalidasi semua payload request untuk mencegah data buruk masuk ke sistem.
+
+### Arsitektur
+
+Proyek ini menggunakan arsitektur 3-lapis (Handler, Service, Repository) untuk memisahkan tanggung jawab. Error ditangani di Service (`HTTPException`) dan ditangkap oleh global error handler `app.onError`.
+
+---
+
+**Dibuat dengan ❤️ menggunakan Bun, Hono, dan PostgreSQL**

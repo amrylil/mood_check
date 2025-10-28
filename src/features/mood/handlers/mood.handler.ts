@@ -10,8 +10,9 @@ export class MoodHandler {
   static create = async (c: Context) => {
     try {
       const dto = (await c.req.json()) as CreateMoodRequestDto;
-
-      const created = await service.create(dto);
+      const payload = c.get("jwtPayload");
+      const userIdFromToken = payload.id;
+      const created = await service.create(dto, userIdFromToken);
 
       const responseBody = ApiResponse.success(
         created,
@@ -32,8 +33,9 @@ export class MoodHandler {
   };
 
   static getByUserId = async (c: Context) => {
-    const { userId } = c.req.param();
-    const all = await service.getByUserId(userId);
+    const payload = c.get("jwtPayload");
+    const userIdFromToken = payload.id;
+    const all = await service.getByUserId(userIdFromToken);
 
     const responseBody = ApiResponse.success(
       all,
@@ -43,8 +45,9 @@ export class MoodHandler {
   };
 
   static getSummary = async (c: Context) => {
-    const { userId } = c.req.param();
-    const summary = await service.getSummary(userId);
+    const payload = c.get("jwtPayload");
+    const userIdFromToken = payload.id;
+    const summary = await service.getSummary(userIdFromToken);
 
     const responseBody = ApiResponse.success(
       summary,

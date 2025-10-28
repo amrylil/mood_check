@@ -1,7 +1,6 @@
 import { z } from "../../../config/zod-openapi";
 
 export const createMoodRequestSchema = z.object({
-  userId: z.string().uuid({ message: "User ID harus berupa UUID yang valid" }),
   mood_score: z
     .number()
     .int()

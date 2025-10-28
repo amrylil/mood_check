@@ -23,6 +23,17 @@ export function generateOpenApiSpec() {
     },
     servers: [{ url: "http://localhost:3000/api/v1" }],
   });
+  spec.components = {
+    ...spec.components,
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        description: "Enter JWT token",
+      },
+    },
+  };
 
   console.log(
     "[OpenAPI] Generated spec with paths:",
