@@ -46,7 +46,7 @@ bunx prisma migrate dev
 ### Jalankan Server
 
 ```bash
-bun run src/index.ts
+bun run dev
 ```
 
 Server akan berjalan di:
