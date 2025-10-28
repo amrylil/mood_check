@@ -1,0 +1,67 @@
+{
+  "name": "mood_check",
+  "version": "1.0.0",
+  "description": "Mood Check In API",
+  "main": "index.js",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun dist/server.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "generate": "plop --plopfile scripts/plop.js",
+    "db:setup": "prisma migrate dev && prisma db seed"
+  },
+  "prisma": {
+    "seed": "bun prisma/seed.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amrylil/cv_evaluation_api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/amrylil/cv_evaluation_api/issues"
+  },
+  "homepage": "https://github.com/amrylil/cv_evaluation_api#readme",
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.1.0",
+    "@hono/swagger-ui": "^0.5.2",
+    "@hono/zod-validator": "^0.7.4",
+    "@huggingface/transformers": "^3.7.4",
+    "@prisma/client": "^6.16.2",
+    "@types/bcrypt": "^6.0.0",
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.3",
+    "glob": "^11.0.3",
+    "hono": "4.0.0-rc.2",
+    "multer": "^2.0.2",
+    "onnxruntime-web": "^1.23.0",
+    "pdf-parse": "^1.1.1",
+    "pdf2json": "^3.2.2",
+    "swagger-jsdoc": "^6.2.8",
+    "uuid": "^13.0.0",
+    "winston": "^3.17.0",
+    "zod": "^4.1.11",
+    "zod-openapi": "^5.4.2"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.6.0",
+    "@types/pdf-parse": "^1.1.5",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.1.10",
+    "or": "^0.2.0",
+    "plop": "^4.0.4",
+    "pluralize": "^8.0.0",
+    "prisma": "^6.16.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
